@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 import { env } from './env.js';
 
 export const pool = mysql.createPool({
-  ...env.DB,
+  uri: process.env.DB,
   waitForConnections: true,
   queueLimit: 0,
   enableKeepAlive: true,
