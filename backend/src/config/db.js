@@ -1,8 +1,9 @@
 import mysql from 'mysql2/promise';
 import { env } from './env.js';
 
-export const pool = mysql.createPool({
-  uri: process.env.DB,
+// Setup connection options dynamically
+const connectionOptions = {
+  uri: process.env.DB, // Reads the environment variable from your config
   waitForConnections: true,
   queueLimit: 0,
   enableKeepAlive: true,
@@ -12,7 +13,16 @@ export const pool = mysql.createPool({
   dateStrings: ['DATE'],
   supportBigNumbers: true,
   bigNumberStrings: false,
-});
+};
+
+// CRUCIAL FOR CLOUD HOSTING: Add SSL configuration if running on Render production
+if (process.env.RENDER) {
+  connectionOptions.ssl = {
+    rejectUnauthorized: false
+  };
+}
+
+export const pool = mysql.createPool(connectionOptions);
 
 /** Run `fn(conn)` inside a transaction; auto commit/rollback + release. */
 export async function withTransaction(fn) {
