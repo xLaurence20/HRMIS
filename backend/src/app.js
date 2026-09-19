@@ -14,13 +14,36 @@ export function createApp() {
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
+  // Helmet — allow cross-origin resource loading so images/uploads served
+  // by the API are visible from the Vercel-hosted frontend.
   app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'same-site' },
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
   }));
 
+  // ---- CORS -----------------------------------------------------------
+  // CLIENT_ORIGIN can be a single URL or a comma-separated list.
+  // Example: "https://hrmis-tawny.vercel.app,https://hrmis-prod.vercel.app"
+  const allowedOrigins = String(env.CLIENT_ORIGIN ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   app.use(cors({
-    origin: env.CLIENT_ORIGIN,
-    credentials: true,          // required for the HttpOnly refresh cookie
+    origin(origin, callback) {
+      // Allow requests with no Origin header (curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // In non-prod, be permissive so localhost variants all work.
+      if (!env.IS_PROD) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.warn(`[cors] Rejected origin: ${origin}`);
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
