@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   HRMIS Theme — Tailwind v4
+   Custom design tokens are declared here as CSS variables. Tailwind reads
+   `--color-*` and generates utility classes automatically:
+     --color-brand-600  ->  bg-brand-600, text-brand-600, border-brand-600...
+     --animate-fade-in  ->  animate-fade-in
+   ============================================================================ */
+@theme {
+  /* Brand palette (blue) */
+  --color-brand-50:  #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+  --color-brand-950: #172554;
+
+  /* Animations */
+  --animate-fade-in:  fade-in 180ms ease-out;
+  --animate-slide-up: slide-up 220ms ease-out;
+
+  @keyframes fade-in {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes slide-up {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ============================================================================
+   Base layer — global defaults
+   ============================================================================ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, sans-serif;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================================
+   Utilities layer — one-off tweaks
+   ============================================================================ */
+@layer utilities {
+  input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+}
