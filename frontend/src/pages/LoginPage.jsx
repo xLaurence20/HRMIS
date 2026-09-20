@@ -10,7 +10,7 @@ import {
  * Municipality photo used as the login backdrop.
  * Drop your own file in /public/images/ and point this constant at it.
  */
-const MUNICIPALITY_IMAGE = '/public/images/lapaz.jpg';
+const MUNICIPALITY_IMAGE = '../images/lapaz.jpg';
 
 const HIGHLIGHTS = [
   'Role-based access control for all municipal offices',
