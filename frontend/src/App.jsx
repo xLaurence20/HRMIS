@@ -24,6 +24,14 @@ import AttendanceDashboard from './pages/AttendanceDashboard';
 import HolidayCalendar from './pages/HolidayCalendar';
 import AttendanceThresholds from './pages/AttendanceThresholds';
 
+import LeaveTypesAdmin from './pages/LeaveTypesAdmin';
+import LeaveApplicationForm from './pages/LeaveApplicationForm';
+import MyLeaves from './pages/MyLeaves';
+import ApprovalInbox from './pages/ApprovalInbox';
+import LeaveApplicationDetail from './pages/LeaveApplicationDetail';
+import LeaveCreditLedger from './pages/LeaveCreditLedger';
+import LeaveDashboard from './pages/LeaveDashboard';
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -75,6 +83,23 @@ export default function App() {
                 element={<ProtectedRoute permission="attendance.view"><AttendanceThresholds /></ProtectedRoute>} />
               <Route path="/holidays"
                 element={<ProtectedRoute permission="dtr.view"><HolidayCalendar /></ProtectedRoute>} />
+
+              {/* Leaves — order matters: static paths before :id */}
+              <Route path="/leaves/my"
+                element={<ProtectedRoute permission="leave.view"><MyLeaves /></ProtectedRoute>} />
+              <Route path="/leaves/inbox"
+                element={<ProtectedRoute permission={['leave.review','leave.approve']}><ApprovalInbox /></ProtectedRoute>} />
+              <Route path="/leaves/new"
+                element={<ProtectedRoute permission="leave.apply"><LeaveApplicationForm /></ProtectedRoute>} />
+              <Route path="/leaves/:id"
+                element={<ProtectedRoute permission="leave.view"><LeaveApplicationDetail /></ProtectedRoute>} />
+
+              <Route path="/leave-dashboard"
+                element={<ProtectedRoute permission="leave_credits.view"><LeaveDashboard /></ProtectedRoute>} />
+              <Route path="/leave-credits/ledger"
+                element={<ProtectedRoute permission="leave_credits.view"><LeaveCreditLedger /></ProtectedRoute>} />
+              <Route path="/leave-types"
+                element={<ProtectedRoute permission="leave.view"><LeaveTypesAdmin /></ProtectedRoute>} />
 
               {/* Admin */}
               <Route path="/roles"

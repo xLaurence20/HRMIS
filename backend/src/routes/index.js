@@ -10,6 +10,9 @@ import orgRoutes            from './orgRoutes.js';
 import holidayRoutes        from './holidayRoutes.js';
 import dtrRoutes            from './dtrRoutes.js';
 import attendanceRoutes     from './attendanceRoutes.js';
+import leaveTypeRoutes      from './leaveTypeRoutes.js';
+import leaveRoutes          from './leaveRoutes.js';
+import leaveCreditRoutes    from './leaveCreditRoutes.js';
 
 const router = Router();
 
@@ -27,5 +30,8 @@ router.use('/org',             orgRoutes);
 router.use('/holidays',        holidayRoutes);
 router.use('/dtr',             dtrRoutes);
 router.use('/attendance',      attendanceRoutes);
+router.use('/leave-types',     leaveTypeRoutes);
+router.use('/leaves',          leaveRoutes);
+router.use('/leave-credits',   leaveCreditRoutes);
 
 export default router;

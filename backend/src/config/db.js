@@ -17,16 +17,29 @@ const caPath =
   process.env.DB_SSL_CA_PATH ??
   path.resolve(__dirname, '../../certs/aiven-ca.pem');
 
+/**
+ * Enable SSL only when:
+ *   - NODE_ENV=production (Render + Aiven), OR
+ *   - DB_SSL=true is set explicitly in .env
+ *
+ * Local MariaDB installs (XAMPP, native) typically don't have SSL enabled,
+ * so we default to plain connections in dev.
+ */
+const sslEnabled = env.IS_PROD || String(process.env.DB_SSL).toLowerCase() === 'true';
+
 let sslConfig;
-if (fs.existsSync(caPath)) {
-  sslConfig = {
-    ca: fs.readFileSync(caPath),
-    rejectUnauthorized: true,
-  };
-} else if (env.IS_PROD) {
-  // Fail loud in production if a CA was expected but missing.
-  // (Set DB_SSL_CA_PATH or add backend/certs/aiven-ca.pem.)
-  console.warn(`[db] SSL CA not found at ${caPath}. Connecting without SSL.`);
+if (sslEnabled) {
+  if (fs.existsSync(caPath)) {
+    sslConfig = {
+      ca: fs.readFileSync(caPath),
+      rejectUnauthorized: true,
+    };
+  } else {
+    // SSL requested but no CA on disk. Fall back to SSL with verification off
+    // (still encrypted, but not CA-verified) so the connection can proceed.
+    console.warn(`[db] SSL requested but CA not found at ${caPath}. Using unverified TLS.`);
+    sslConfig = { rejectUnauthorized: false };
+  }
 }
 
 export const pool = mysql.createPool({

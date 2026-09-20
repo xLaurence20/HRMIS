@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   ShieldCheck, LayoutDashboard, Shield, User, LogOut, Menu, X,
   Users, Building2, Briefcase, Network,
-  CalendarClock, TrendingDown, Calendar,
+  CalendarClock, TrendingDown, Calendar, Wallet, Inbox, FileText,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +16,9 @@ const NAV = [
   { to: '/dtr',         label: 'DTR',         Icon: CalendarClock, permission: 'dtr.view' },
   { to: '/attendance',  label: 'Attendance',  Icon: TrendingDown,  permission: 'attendance.view' },
   { to: '/holidays',    label: 'Holidays',    Icon: Calendar,      permission: 'dtr.view' },
+  { to: '/leaves/my',   label: 'My Leaves',   Icon: FileText,      permission: 'leave.view' },
+  { to: '/leaves/inbox',label: 'Approvals',   Icon: Inbox,         permission: ['leave.review','leave.approve'] },
+  { to: '/leave-dashboard', label: 'Leave',   Icon: Wallet,        permission: 'leave_credits.view' },
   { to: '/roles',       label: 'Roles',       Icon: Shield,        permission: 'roles.view' },
   { to: '/profile/setup', label: 'My Profile', Icon: User },
 ];
@@ -25,7 +28,10 @@ export default function AppShell() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const links = NAV.filter((n) => !n.permission || hasPermission(n.permission));
+  const links = NAV.filter((n) => {
+    if (!n.permission) return true;
+    return hasPermission(n.permission);
+  });
   const initials = (user?.username?.[0] ?? '').toUpperCase() || '?';
 
   async function handleLogout() {
@@ -36,7 +42,7 @@ export default function AppShell() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
           <button type="button" onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle navigation"
             className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 lg:hidden">
@@ -50,11 +56,12 @@ export default function AppShell() {
             <span className="text-sm font-bold tracking-tight text-slate-900">HRMIS</span>
           </div>
 
-          <nav className="ml-6 hidden items-center gap-0.5 lg:flex">
+          <nav className="ml-4 hidden flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
             {links.map(({ to, label, Icon }) => (
-              <NavLink key={to} to={to} end={to === '/'}
+              <NavLink key={to} to={to}
+                end={to === '/'}
                 className={({ isActive }) =>
-                  `inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium transition ${
+                  `inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium transition ${
                     isActive
                       ? 'bg-brand-50 text-brand-700'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
