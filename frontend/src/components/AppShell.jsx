@@ -5,6 +5,7 @@ import {
   Users, Building2, Briefcase, Network,
   CalendarClock, TrendingDown, Calendar, Wallet, Inbox, FileText,
   PanelLeftClose, PanelLeftOpen,
+  BarChart3, History,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,6 +24,8 @@ const NAV = [
   { to: '/leaves/my',   label: 'My Leaves',   Icon: FileText,      permission: 'leave.view' },
   { to: '/leaves/inbox',label: 'Approvals',   Icon: Inbox,         permission: ['leave.review','leave.approve'] },
   { to: '/leave-dashboard', label: 'Leave',   Icon: Wallet,        permission: 'leave_credits.view' },
+  { to: '/reports',     label: 'Reports',     Icon: BarChart3,     permission: 'reports.view' },
+  { to: '/audit',       label: 'Audit',       Icon: History,       permission: 'audit_logs.view' },
   { to: '/roles',       label: 'Roles',       Icon: Shield,        permission: 'roles.view' },
   { to: '/profile/setup', label: 'My Profile', Icon: User },
 ];
@@ -30,7 +33,7 @@ const NAV = [
 export default function AppShell() {
   const { user, role, logout, hasPermission } = useAuth();
   const navigate = useNavigate();
-  
+
   // Sidebar states
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Desktop expand/collapse
   const [isMobileOpen, setIsMobileOpen] = useState(false);  // Mobile drawer
@@ -39,7 +42,7 @@ export default function AppShell() {
     if (!n.permission) return true;
     return hasPermission(n.permission);
   });
-  
+
   const initials = (user?.username?.[0] ?? '').toUpperCase() || '?';
 
   async function handleLogout() {
@@ -49,7 +52,7 @@ export default function AppShell() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
-      
+
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
@@ -82,7 +85,7 @@ export default function AppShell() {
           >
             HRMIS
           </span>
-          
+
           {/* Mobile Close Button */}
           <button
             type="button"
@@ -154,7 +157,7 @@ export default function AppShell() {
 
       {/* ---------------- Main Content Area ---------------- */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        
+
         {/* Top Header */}
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8">
           <div className="flex items-center gap-4">

@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import ExecutiveDashboard from './pages/ExecutiveDashboard';
 import RoleManagement from './pages/RoleManagement';
 import UserProfileSetup from './pages/UserProfileSetup';
 import ForbiddenPage from './pages/ForbiddenPage';
@@ -32,6 +33,22 @@ import LeaveApplicationDetail from './pages/LeaveApplicationDetail';
 import LeaveCreditLedger from './pages/LeaveCreditLedger';
 import LeaveDashboard from './pages/LeaveDashboard';
 
+import AuditTrail from './pages/AuditTrail';
+import AuditDashboard from './pages/AuditDashboard';
+import ReportLibrary from './pages/ReportLibrary';
+import COEGenerator from './pages/COEGenerator';
+import ServiceRecordGenerator from './pages/ServiceRecordGenerator';
+
+/**
+ * Pick the right home dashboard based on permission.
+ * Executive users get the KPI dashboard; everyone else gets the simple card view.
+ */
+function HomeRouter() {
+  const { hasPermission } = useAuth();
+  if (hasPermission('reports.executive_dashboard')) return <ExecutiveDashboard />;
+  return <DashboardPage />;
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -51,8 +68,8 @@ export default function App() {
                 element={<ProtectedRoute requireProfileComplete={false}><UserProfileSetup /></ProtectedRoute>} />
               <Route path="/forbidden" element={<ForbiddenPage />} />
 
-              <Route path="/"
-                element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              {/* Home — executive or simple */}
+              <Route path="/" element={<ProtectedRoute><HomeRouter /></ProtectedRoute>} />
 
               {/* Employees */}
               <Route path="/employees"
@@ -84,7 +101,7 @@ export default function App() {
               <Route path="/holidays"
                 element={<ProtectedRoute permission="dtr.view"><HolidayCalendar /></ProtectedRoute>} />
 
-              {/* Leaves — order matters: static paths before :id */}
+              {/* Leaves */}
               <Route path="/leaves/my"
                 element={<ProtectedRoute permission="leave.view"><MyLeaves /></ProtectedRoute>} />
               <Route path="/leaves/inbox"
@@ -100,6 +117,20 @@ export default function App() {
                 element={<ProtectedRoute permission="leave_credits.view"><LeaveCreditLedger /></ProtectedRoute>} />
               <Route path="/leave-types"
                 element={<ProtectedRoute permission="leave.view"><LeaveTypesAdmin /></ProtectedRoute>} />
+
+              {/* Reports */}
+              <Route path="/reports"
+                element={<ProtectedRoute permission="reports.view"><ReportLibrary /></ProtectedRoute>} />
+              <Route path="/reports/coe"
+                element={<ProtectedRoute permission="reports.generate_coe"><COEGenerator /></ProtectedRoute>} />
+              <Route path="/reports/service-record"
+                element={<ProtectedRoute permission="service_records.view"><ServiceRecordGenerator /></ProtectedRoute>} />
+
+              {/* Audit */}
+              <Route path="/audit"
+                element={<ProtectedRoute permission="audit_logs.view"><AuditTrail /></ProtectedRoute>} />
+              <Route path="/audit/dashboard"
+                element={<ProtectedRoute permission="audit_logs.view"><AuditDashboard /></ProtectedRoute>} />
 
               {/* Admin */}
               <Route path="/roles"

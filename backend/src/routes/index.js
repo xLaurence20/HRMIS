@@ -13,6 +13,9 @@ import attendanceRoutes     from './attendanceRoutes.js';
 import leaveTypeRoutes      from './leaveTypeRoutes.js';
 import leaveRoutes          from './leaveRoutes.js';
 import leaveCreditRoutes    from './leaveCreditRoutes.js';
+import auditRoutes          from './auditRoutes.js';
+import dashboardRoutes      from './dashboardRoutes.js';
+import reportRoutes         from './reportRoutes.js';
 
 const router = Router();
 
@@ -33,5 +36,8 @@ router.use('/attendance',      attendanceRoutes);
 router.use('/leave-types',     leaveTypeRoutes);
 router.use('/leaves',          leaveRoutes);
 router.use('/leave-credits',   leaveCreditRoutes);
+router.use('/audit-logs',      auditRoutes);
+router.use('/dashboard',       dashboardRoutes);
+router.use('/reports',         reportRoutes);
 
 export default router;

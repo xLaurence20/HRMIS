@@ -129,12 +129,12 @@ SELECT r.`id`, p.`id` FROM `roles` r JOIN `permissions` p ON (
 ) WHERE r.`code` = 'APPROVER';
 
 -- EMPLOYEE
+-- EMPLOYEE — self-service only
 INSERT IGNORE INTO `role_permissions` (`role_id`,`permission_id`)
 SELECT r.`id`, p.`id` FROM `roles` r JOIN `permissions` p
 ON p.`permission_name` IN (
-  'profile.view','profile.update','employees.view','service_records.view',
-  'dtr.view','attendance.view','leave.view','leave.apply','leave.cancel',
-  'leave_credits.view','reports.view'
+  'profile.view','profile.update',
+  'leave.view','leave.apply','leave.cancel','leave_credits.view'
 ) WHERE r.`code` = 'EMPLOYEE';
 
 -- Bootstrap admin — REPLACE HASH BELOW
