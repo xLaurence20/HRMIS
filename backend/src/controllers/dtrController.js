@@ -291,7 +291,7 @@ export const createPeriod = asyncHandler(async (req, res) => {
       return v;
     });
 
-    await conn.query(
+        await conn.query(
       `INSERT INTO dtr_logs
          (period_id, employee_id, log_date,
           am_arrival, am_departure, pm_arrival, pm_departure,
@@ -303,13 +303,13 @@ export const createPeriod = asyncHandler(async (req, res) => {
        VALUES ${inserts.map(() =>
          '(?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
        ).join(',')}`,
-      // 24 columns per row, but two time ones are NULL literals, so 22 binds
+      // 24 columns per row. 6 are hardcoded NULLs, so we bind 18 parameters per row.
       inserts.flatMap((row) => [
-        row[0], row[1], row[2],
-        row[9], row[10], row[11], row[12],
-        row[13], row[14], row[15],
-        row[16], row[17], row[18], row[19],
-        row[20], row[21], row[22], row[23],
+        row[0], row[1], row[2],         // period_id, employee_id, log_date
+        row[8], row[9], row[10], row[11], // tardiness, undertime, overtime, hours_worked
+        row[12], row[13], row[14],        // is_absent, is_holiday, holiday_id
+        row[15], row[16], row[17], row[18], // is_leave, leave_type, leave_hours, is_lwop
+        row[19], row[20], row[21], row[22], // source, remarks, created_by, updated_by
       ])
     );
 
