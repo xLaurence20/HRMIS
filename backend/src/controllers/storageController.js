@@ -89,3 +89,36 @@ export const getServerTerminalStats = asyncHandler(async (req, res) => {
     throw new AppError('Failed to run server commands', 500, 'EXEC_ERROR', { error: error.message });
   }
 });
+
+// Generates dummy files for testing/evidence
+export const seedDummyFiles = asyncHandler(async (req, res) => {
+  if (req.user.roleCode !== 'ADMIN') throw new AppError('Forbidden', 403);
+
+  const dirs = [
+    'backups', 'videos', 'exports', 'images', 'documents'
+  ];
+  
+  // Create folders
+  dirs.forEach(d => {
+    const p = path.join(SCAN_FOLDER, d);
+    if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+  });
+
+  // Helper to create file of specific size (in MB)
+  const createFile = (relativePath, sizeMB) => {
+    const fullPath = path.join(SCAN_FOLDER, relativePath);
+    const buffer = Buffer.alloc(sizeMB * 1024 * 1024, '0'); // Fill with zeros
+    fs.writeFileSync(fullPath, buffer);
+  };
+
+  // Generate files matching the sample image (but smaller so we don't crash Render)
+  createFile('backups/db_backup_2026-10-12.sql.gz', 10); // 10 MB
+  createFile('backups/db_backup_2026-10-05.sql.gz', 8);  // 8 MB
+  createFile('videos/orientation_walkthrough.mp4', 15);  // 15 MB
+  createFile('exports/residents_export_2026-09.xlsx', 2); // 2 MB
+  createFile('documents/annual_report_2025.pdf', 1);      // 1 MB
+  createFile('images/event_banner_hires.png', 5);         // 5 MB
+  createFile('documents/minutes_2026-09.docx', 0.5);      // 0.5 MB (approx 500KB)
+
+  return ok(res, { message: 'Dummy files generated successfully' });
+});
