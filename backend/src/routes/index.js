@@ -16,6 +16,7 @@ import leaveCreditRoutes    from './leaveCreditRoutes.js';
 import auditRoutes          from './auditRoutes.js';
 import dashboardRoutes      from './dashboardRoutes.js';
 import reportRoutes         from './reportRoutes.js';
+import { getStorageStats } from '../controllers/storageController.js';
 
 const router = Router();
 
@@ -39,5 +40,6 @@ router.use('/leave-credits',   leaveCreditRoutes);
 router.use('/audit-logs',      auditRoutes);
 router.use('/dashboard',       dashboardRoutes);
 router.use('/reports',         reportRoutes);
+router.get('/storage-stats', authenticate, getStorageStats);
 
 export default router;

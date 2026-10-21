@@ -1,0 +1,110 @@
+import { useEffect, useState } from 'react';
+import { api } from '../api/axiosClient';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+import { HardDrive, Loader2 } from 'lucide-react';
+import Alert from '../components/ui/Alert';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+export default function StorageMonitor() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [desc, setDesc] = useState(true); // R3: Sort largest first by default
+
+  useEffect(() => {
+    api.get('/storage-stats')
+      .then((res) => setData(res.data.data))
+      .catch((err) => setError(err.response?.data?.error?.message || 'Error loading data'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="p-8 text-center"><Loader2 className="animate-spin h-8 w-8 mx-auto text-brand-600" /></div>;
+  if (error) return <div className="p-8"><Alert variant="error">{error}</Alert></div>;
+
+  const fmt = (bytes) => {
+    if (bytes >= 1024 ** 3) return (bytes / 1024 ** 3).toFixed(3) + ' GB';
+    if (bytes >= 1024 ** 2) return (bytes / 1024 ** 2).toFixed(2) + ' MB';
+    return (bytes / 1024).toFixed(1) + ' KB';
+  };
+
+  // R5: Warning levels
+  const pct = (data.used / data.total) * 100;
+  const level = pct >= 90 ? 'CRITICAL' : pct >= 80 ? 'WARNING' : 'NORMAL';
+  const levelColor = pct >= 90 ? 'text-red-600' : pct >= 80 ? 'text-amber-600' : 'text-emerald-600';
+
+  // R3: Sort logic
+  const sortedFiles = [...data.files].sort((a, b) => desc ? b.size - a.size : a.size - b.size);
+
+  // Chart Data (R4)
+  const chartData = {
+    labels: ['Application files', 'Other used', 'Free'],
+    datasets: [{
+      data: [data.app, data.used - data.app, data.free],
+      backgroundColor: ['#2563eb', '#f59e0b', '#e2e8f0'],
+      borderWidth: 0,
+    }]
+  };
+
+  return (
+    <div className="mx-auto max-w-5xl p-8">
+      <header className="mb-6 flex items-center gap-3">
+        <HardDrive className="h-8 w-8 text-brand-600" />
+        <div>
+          <h1 className="text-2xl font-bold">Admin Storage Monitor</h1>
+          <p className="text-sm text-slate-500">Server storage and stored files</p>
+        </div>
+      </header>
+
+      {/* R4 & R5: Chart and Summary */}
+      <div className="mb-8 flex items-center gap-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="h-48 w-48">
+          <Doughnut data={chartData} options={{ cutout: '70%' }} />
+        </div>
+        <div>
+          <p className="text-2xl font-semibold text-slate-800">
+            {fmt(data.used)} of {fmt(data.total)} used ({pct.toFixed(1)}%)
+            <span className={`ml-3 font-bold ${levelColor}`}>- {level}</span>
+          </p>
+          <p className="mt-2 text-slate-500">
+            Application files: <span className="font-semibold">{fmt(data.app)}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* R2 & R3: Table */}
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-slate-50 text-slate-600">
+            <tr>
+              <th className="px-4 py-3">File</th>
+              <th className="px-4 py-3">Path</th>
+              <th 
+                className="px-4 py-3 cursor-pointer hover:bg-slate-200 transition"
+                onClick={() => setDesc(!desc)}
+              >
+                Size ({desc ? 'largest first' : 'smallest first'})
+              </th>
+              <th className="px-4 py-3">Modified</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {sortedFiles.map((f, i) => (
+              <tr key={i} className="hover:bg-slate-50">
+                {/* R6: textContent equivalent is safe in React by default (avoids XSS) */}
+                <td className="px-4 py-3 font-medium text-slate-800">{f.name}</td>
+                <td className="px-4 py-3 font-mono text-xs text-slate-500">{f.path}</td>
+                <td className="px-4 py-3 text-right font-mono text-slate-700">{fmt(f.size)}</td>
+                <td className="px-4 py-3 text-xs text-slate-500">{new Date(f.modified).toLocaleString()}</td>
+              </tr>
+            ))}
+            {sortedFiles.length === 0 && (
+              <tr><td colSpan="4" className="px-4 py-8 text-center text-slate-500">No files found in uploads folder.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

@@ -39,6 +39,8 @@ import ReportLibrary from './pages/ReportLibrary';
 import COEGenerator from './pages/COEGenerator';
 import ServiceRecordGenerator from './pages/ServiceRecordGenerator';
 
+import StorageMonitor from './pages/StorageMonitor';
+
 /**
  * Pick the right home dashboard based on permission.
  * Executive users get the KPI dashboard; everyone else gets the simple card view.
@@ -135,6 +137,10 @@ export default function App() {
               {/* Admin */}
               <Route path="/roles"
                 element={<ProtectedRoute permission="roles.view"><RoleManagement /></ProtectedRoute>} />
+
+              {/*Storage Monitor*/}
+              <Route path="/admin/storage" 
+                element={<ProtectedRoute permission="roles.view"><StorageMonitor /></ProtectedRoute>} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
