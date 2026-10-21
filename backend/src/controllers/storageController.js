@@ -65,21 +65,25 @@ export const getServerTerminalStats = asyncHandler(async (req, res) => {
     throw new AppError('Forbidden', 403, 'FORBIDDEN');
   }
 
-    try {
+  try {
     const { stdout: dfOut } = await execPromise('df -h');
     const { stdout: dfiOut } = await execPromise('df -i');
-    const { stdout: duOut } = await execPromise('du -sh * | sort -rh | head -n 5'); 
     
-    // NEW: Prove this is Render!
-    const { stdout: whoami } = await execPromise('whoami');
-    const { stdout: envOut } = await execPromise('env | grep -i render | head -n 3');
+    // 1. Basic folder sizes (like the first line in your sample)
+    const { stdout: duBasic } = await execPromise('du -sh * | sort -rh');
+    
+    // 2. Top 15 largest files/folders (like the middle of your sample)
+    const { stdout: duTop15 } = await execPromise('du -ah . | sort -rh | head -n 15');
+    
+    // 3. Files over 10MB (like the bottom of your sample)
+    const { stdout: findLarge } = await execPromise('find . -type f -size +10M -exec ls -lh {} +');
 
     return ok(res, {
       df: dfOut,
       dfi: dfiOut,
-      du: duOut,
-      whoami: whoami.trim(),
-      env: envOut.trim()
+      duBasic: duBasic,
+      duTop15: duTop15,
+      findLarge: findLarge,
     });
   } catch (error) {
     throw new AppError('Failed to run server commands', 500, 'EXEC_ERROR', { error: error.message });

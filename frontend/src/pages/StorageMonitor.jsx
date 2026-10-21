@@ -113,12 +113,13 @@ export default function StorageMonitor() {
         </table>
       </div>
 
-      {/* LIVE SERVER TERMINAL EVIDENCE (Part A) */}
+            {/* LIVE SERVER TERMINAL EVIDENCE (Part A) */}
       {serverStats && (
         <div className="mt-12">
           <h2 className="mb-4 text-xl font-bold text-slate-800">Live Server Terminal Output (Part A Evidence)</h2>
           <p className="mb-6 text-sm text-slate-500">These commands are executed live on the Render hosting server.</p>
           
+          {/* df -h */}
           <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
             <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
               $ df -h (Live Server Capacity)
@@ -126,6 +127,7 @@ export default function StorageMonitor() {
             <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.df}</pre>
           </div>
 
+          {/* df -i */}
           <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
             <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
               $ df -i (Live Server Inodes)
@@ -133,13 +135,33 @@ export default function StorageMonitor() {
             <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.dfi}</pre>
           </div>
 
+          {/* du -sh * */}
           <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
             <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
-              $ du -sh * (Largest Directories on Live Server)
+              $ du -sh * (Overall Directory Sizes)
             </div>
-            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.du}</pre>
+            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.duBasic}</pre>
           </div>
 
+          {/* du -ah | sort -rh | head -n 15 */}
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
+            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
+              $ du -ah . | sort -rh | head -n 15 (Top 15 Largest Files & Folders)
+            </div>
+            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.duTop15}</pre>
+          </div>
+
+          {/* find files > 10M */}
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
+            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
+              $ find . -type f -size +10M -exec ls -lh {"{}"} + (Files larger than 10MB)
+            </div>
+            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">
+              {serverStats.findLarge.trim() === '' ? 'No files larger than 10MB found.' : serverStats.findLarge}
+            </pre>
+          </div>
+
+          
                     {/* Proof of Environment */}
           <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
             <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
@@ -154,7 +176,7 @@ export default function StorageMonitor() {
             </div>
             <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.env}</pre>
           </div>
-          
+
         </div>
       )}
     </div>
