@@ -12,12 +12,19 @@ export default function StorageMonitor() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [desc, setDesc] = useState(true); // R3: Sort largest first by default
+  const [serverStats, setServerStats] = useState(null); // Terminal stats state
 
   useEffect(() => {
+    // 1. Fetch the file list
     api.get('/storage-stats')
       .then((res) => setData(res.data.data))
       .catch((err) => setError(err.response?.data?.error?.message || 'Error loading data'))
       .finally(() => setLoading(false));
+
+    // 2. Fetch the live server terminal output (df, du)
+    api.get('/storage-server-stats')
+      .then((res) => setServerStats(res.data.data))
+      .catch((err) => console.error("Terminal stats error", err));
   }, []);
 
   if (loading) return <div className="p-8 text-center"><Loader2 className="animate-spin h-8 w-8 mx-auto text-brand-600" /></div>;
@@ -105,6 +112,35 @@ export default function StorageMonitor() {
           </tbody>
         </table>
       </div>
+
+      {/* LIVE SERVER TERMINAL EVIDENCE (Part A) */}
+      {serverStats && (
+        <div className="mt-12">
+          <h2 className="mb-4 text-xl font-bold text-slate-800">Live Server Terminal Output (Part A Evidence)</h2>
+          <p className="mb-6 text-sm text-slate-500">These commands are executed live on the Render hosting server.</p>
+          
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
+            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
+              $ df -h (Live Server Capacity)
+            </div>
+            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.df}</pre>
+          </div>
+
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
+            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
+              $ df -i (Live Server Inodes)
+            </div>
+            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.dfi}</pre>
+          </div>
+
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
+            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
+              $ du -sh * (Largest Directories on Live Server)
+            </div>
+            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.du}</pre>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

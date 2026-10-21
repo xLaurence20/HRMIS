@@ -18,6 +18,7 @@ import dashboardRoutes      from './dashboardRoutes.js';
 import reportRoutes         from './reportRoutes.js';
 import { getStorageStats } from '../controllers/storageController.js';
 import { authenticate } from '../middleware/auth.js';
+import { getStorageStats, getServerTerminalStats } from '../controllers/storageController.js';
 
 const router = Router();
 
@@ -42,5 +43,6 @@ router.use('/audit-logs',      auditRoutes);
 router.use('/dashboard',       dashboardRoutes);
 router.use('/reports',         reportRoutes);
 router.get('/storage-stats', authenticate, getStorageStats);
+router.get('/storage-server-stats', authenticate, getServerTerminalStats); // <-- Add this
 
 export default router;
