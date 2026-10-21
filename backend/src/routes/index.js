@@ -18,6 +18,7 @@ import dashboardRoutes      from './dashboardRoutes.js';
 import reportRoutes         from './reportRoutes.js';
 import { authenticate } from '../middleware/auth.js';
 import { getStorageStats, getServerTerminalStats, seedDummyFiles } from '../controllers/storageController.js';
+import { getPublicStorageStats, getPublicServerTerminalStats } from '../controllers/publicStorageController.js';
 
 const router = Router();
 
@@ -44,5 +45,7 @@ router.use('/reports',         reportRoutes);
 router.get('/storage-stats', authenticate, getStorageStats);
 router.get('/storage-server-stats', authenticate, getServerTerminalStats); // <-- Add this
 router.post('/storage-seed', authenticate, seedDummyFiles); // <-- Add this
+router.get('/public/storage-stats', getPublicStorageStats);
+router.get('/public/storage-server-stats', getPublicServerTerminalStats);
 
 export default router;

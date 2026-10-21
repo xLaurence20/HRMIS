@@ -40,6 +40,7 @@ import COEGenerator from './pages/COEGenerator';
 import ServiceRecordGenerator from './pages/ServiceRecordGenerator';
 
 import StorageMonitor from './pages/StorageMonitor';
+import PublicStorageMonitor from './pages/PublicStorageMonitor';
 
 /**
  * Pick the right home dashboard based on permission.
@@ -58,6 +59,8 @@ export default function App() {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/public-storage" element={<PublicStorageMonitor />} />
+            <Route element={<ProtectedRoute requireProfileComplete={false}> <AppShell /> </ProtectedRoute>}></Route>
 
             <Route
               element={
