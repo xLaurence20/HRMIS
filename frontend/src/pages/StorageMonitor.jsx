@@ -161,22 +161,6 @@ export default function StorageMonitor() {
             </pre>
           </div>
 
-          
-                    {/* Proof of Environment */}
-          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
-            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
-              $ whoami (Current User on Server)
-            </div>
-            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.whoami}</pre>
-          </div>
-
-          <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
-            <div className="flex items-center bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300">
-              $ env | grep -i render (Render Environment Variables)
-            </div>
-            <pre className="p-4 text-sm text-green-400 overflow-x-auto font-mono">{serverStats.env}</pre>
-          </div>
-
         </div>
       )}
     </div>
