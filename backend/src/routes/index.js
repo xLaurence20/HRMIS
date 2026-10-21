@@ -17,6 +17,7 @@ import auditRoutes          from './auditRoutes.js';
 import dashboardRoutes      from './dashboardRoutes.js';
 import reportRoutes         from './reportRoutes.js';
 import { getStorageStats } from '../controllers/storageController.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
