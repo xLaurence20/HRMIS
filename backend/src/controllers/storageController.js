@@ -65,16 +65,21 @@ export const getServerTerminalStats = asyncHandler(async (req, res) => {
     throw new AppError('Forbidden', 403, 'FORBIDDEN');
   }
 
-  try {
+    try {
     const { stdout: dfOut } = await execPromise('df -h');
     const { stdout: dfiOut } = await execPromise('df -i');
-    // Running from the backend root where node_modules lives
     const { stdout: duOut } = await execPromise('du -sh * | sort -rh | head -n 5'); 
+    
+    // NEW: Prove this is Render!
+    const { stdout: whoami } = await execPromise('whoami');
+    const { stdout: envOut } = await execPromise('env | grep -i render | head -n 3');
 
     return ok(res, {
       df: dfOut,
       dfi: dfiOut,
       du: duOut,
+      whoami: whoami.trim(),
+      env: envOut.trim()
     });
   } catch (error) {
     throw new AppError('Failed to run server commands', 500, 'EXEC_ERROR', { error: error.message });
